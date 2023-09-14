@@ -1,10 +1,13 @@
-import { Button } from "@/components/ui/button";
+import InitialModal from "@/components/modals/InitialModal";
+import { initialProfile } from "@/lib/initialProfile";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div>
-      <p className="text-3xl font-bold text-indigo-500">Hello Discord Close</p>
-      <Button>Click me</Button>
-    </div>
-  );
+export default async function Home() {
+  const profile = await initialProfile();
+
+  if (profile.server) {
+    return redirect(`/servers/${profile.server.id}`);
+  }
+
+  return <InitialModal />;
 }
