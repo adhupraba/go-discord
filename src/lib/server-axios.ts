@@ -1,11 +1,5 @@
 import { serverEnv } from "@/constants/config";
 import axios from "axios";
-
-export const webAxios = axios.create({
-  baseURL: "/api/gateway",
-  withCredentials: true,
-});
-
 import { cookies } from "next/headers";
 
 export const serverAxios = () => {

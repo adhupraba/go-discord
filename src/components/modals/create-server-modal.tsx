@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/Dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FileUpload from "@/components/FileUpload";
+import FileUpload from "@/components/file-upload";
+import { webAxios } from "@/lib/web-axios";
+import { useRouter } from "next/navigation";
+import { useModal } from "@/hooks/use-modal-store";
 
-interface IInitialModalProps {}
+interface ICreateServerModalProps {}
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Server name is required." }),
@@ -26,8 +29,10 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const InitialModal: FC<IInitialModalProps> = () => {
-  const [isMounted, setIsMounted] = useState(false);
+const CreateServerModal: FC<ICreateServerModalProps> = () => {
+  const router = useRouter();
+
+  const { isOpen, type, onClose } = useModal();
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -37,20 +42,29 @@ const InitialModal: FC<IInitialModalProps> = () => {
     },
   });
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+  const isModalOpen = isOpen && type === "createServer";
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: FormSchema) => {
-    console.log("onsubbmit values =>", values);
+    try {
+      console.log("onsubbmit values =>", values);
+      await webAxios.post("/api/server", values);
+
+      form.reset();
+      router.refresh();
+      onClose();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  if (!isMounted) return null;
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
 
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Customize your server</DialogTitle>
@@ -109,4 +123,4 @@ const InitialModal: FC<IInitialModalProps> = () => {
   );
 };
 
-export default InitialModal;
+export default CreateServerModal;
