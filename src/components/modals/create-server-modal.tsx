@@ -47,7 +47,6 @@ const CreateServerModal: FC<ICreateServerModalProps> = () => {
 
   const onSubmit = async (values: FormSchema) => {
     try {
-      console.log("onsubbmit values =>", values);
       await webAxios.post("/api/server", values);
 
       form.reset();

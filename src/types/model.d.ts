@@ -1,6 +1,6 @@
 import { GenericObject } from "./helpers";
 
-export type TChannelType = "TEXT" | "VIDEO" | "VIDEO";
+export type TChannelType = "TEXT" | "VIDEO" | "AUDIO";
 
 export type TMemberRole = "ADMIN" | "MODERATOR" | "GUEST";
 

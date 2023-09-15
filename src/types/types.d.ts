@@ -1,4 +1,9 @@
 import { Nullable } from "./helpers";
-import { TProfile, TServer } from "./model";
+import { TChannel, TMember, TProfile, TServer } from "./model";
 
-export type TProfileWithServers = TProfile & { servers: TServer[] };
+export type TProfileWithServer = TProfile & { server: Nullable<TServer> };
+
+export type TServerWithChannelsAndMembers = TServer & {
+  channels: TChannel[];
+  members: (TMember & { profile: TProfile })[];
+};

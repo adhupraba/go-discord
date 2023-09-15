@@ -1,17 +1,16 @@
 import { currentUser, redirectToSignIn } from "@clerk/nextjs";
 import { serverAxios } from "./server-axios";
 import { TApiRes } from "@/types/api";
-import { TProfileWithServers } from "@/types/types";
+import { TProfileWithServer } from "@/types/types";
 
-export const initialProfile = async (): Promise<TProfileWithServers> => {
+export const initialProfile = async (): Promise<TProfileWithServer> => {
   const user = await currentUser();
 
   if (!user) {
-    console.log("redirecting to signin page");
     return redirectToSignIn();
   }
 
-  const { data } = await serverAxios().get<TApiRes<TProfileWithServers>>("/api/profile/upsert");
+  const { data } = await serverAxios().get<TApiRes<TProfileWithServer>>("/api/profile/upsert");
 
   if (data.error) {
     console.error("profile api error =>", data.data);
