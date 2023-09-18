@@ -13,7 +13,7 @@ export const initialProfile = async (): Promise<TProfileWithServer> => {
   const { data } = await serverAxios().get<TApiRes<TProfileWithServer>>("/api/profile/upsert");
 
   if (data.error) {
-    console.error("profile api error =>", data.data);
+    console.error("initial profile api error =>", data.data);
     return redirectToSignIn();
   }
 

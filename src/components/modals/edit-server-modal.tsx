@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FileUpload from "@/components/file-upload";
 import { webAxios } from "@/lib/web-axios";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/hooks/use-modal-store";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Server name is required." }),
@@ -26,10 +27,11 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const InitialModal: FC = () => {
+const EditServerModal: FC = () => {
   const router = useRouter();
 
-  const [isMounted, setIsMounted] = useState(false);
+  const { isOpen, type, data, onClose } = useModal();
+  const { server } = data;
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -40,27 +42,34 @@ const InitialModal: FC = () => {
   });
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (server) {
+      form.setValue("name", server.name);
+      form.setValue("imageUrl", server.imageUrl);
+    }
+  }, [server, form]);
 
+  const isModalOpen = isOpen && type === "editServer";
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: FormSchema) => {
     try {
-      await webAxios.post("/api/server", values);
+      await webAxios.patch(`/api/server/${server?.id}`, values);
 
       form.reset();
       router.refresh();
-      window.location.reload();
+      onClose();
     } catch (err) {
       console.error(err);
     }
   };
 
-  if (!isMounted) return null;
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
 
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Customize your server</DialogTitle>
@@ -109,7 +118,7 @@ const InitialModal: FC = () => {
 
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button disabled={isLoading} variant="primary">
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
@@ -119,4 +128,4 @@ const InitialModal: FC = () => {
   );
 };
 
-export default InitialModal;
+export default EditServerModal;

@@ -12,9 +12,7 @@ import { webAxios } from "@/lib/web-axios";
 import { TApiData, TApiRes } from "@/types/api";
 import { TServer } from "@/types/model";
 
-interface ICreateServerModalProps {}
-
-const InviteModal: FC<ICreateServerModalProps> = () => {
+const InviteModal: FC = () => {
   const {
     isOpen,
     type,

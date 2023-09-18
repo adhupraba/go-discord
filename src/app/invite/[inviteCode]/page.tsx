@@ -22,8 +22,6 @@ const InvitePage = async ({ params: { inviteCode } }: IInvitePageProps) => {
 
   const { data } = await serverAxios().patch<TApiRes<ExistingData | NewData>>(`/api/server/${inviteCode}/verify`);
 
-  console.log("invite code verify api =>", JSON.stringify(data, undefined, 2));
-
   if (data.error) {
     return <div className="text-red-500">Error - {data.data.message}</div>;
   }

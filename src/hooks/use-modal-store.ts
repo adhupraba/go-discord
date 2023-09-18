@@ -2,7 +2,14 @@ import { Nullable } from "@/types/helpers";
 import { TServer } from "@/types/model";
 import { create } from "zustand";
 
-export type ModalType = "createServer" | "invite";
+export type ModalType =
+  | "createServer"
+  | "invite"
+  | "editServer"
+  | "members"
+  | "createChannel"
+  | "leaveServer"
+  | "deleteServer";
 
 interface IModalData {
   server?: TServer;

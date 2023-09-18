@@ -3,8 +3,6 @@
 import { FC } from "react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import { UploadDropzone } from "@/lib/uploadthing";
-
-import "@uploadthing/react/styles.css";
 import Image from "next/image";
 import { X } from "lucide-react";
 

@@ -1,7 +1,6 @@
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
 import { TApiRes } from "@/types/api";
-import { TServer } from "@/types/model";
 import { TServerWithChannelsAndMembers } from "@/types/types";
 import { redirect } from "next/navigation";
 import ServerHeader from "./server-header";
