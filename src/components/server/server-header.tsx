@@ -36,10 +36,10 @@ const ServerHeader: FC<IServerHeaderProps> = ({ server, role }) => {
         {isModerator && (
           <DropdownMenuItem
             onClick={() => onOpen("invite", { server })}
-            className="text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer"
+            className="group text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer"
           >
-            Invite People
-            <UserPlus className="h-4 w-4 ml-auto" />
+            <span className="group-hover:text-indigo-600 group-hover:dark:text-indigo-400">Invite People</span>
+            <UserPlus className="h-4 w-4 ml-auto group-hover:text-indigo-600 group-hover:dark:text-indigo-400" />
           </DropdownMenuItem>
         )}
         {isAdmin && (
@@ -67,10 +67,10 @@ const ServerHeader: FC<IServerHeaderProps> = ({ server, role }) => {
         {isAdmin && (
           <DropdownMenuItem
             onClick={() => onOpen("deleteServer", { server })}
-            className="text-rose-500 dark:text-rose-500 px-3 py-2 text-sm cursor-pointer"
+            className="group text-rose-500 dark:text-rose-500 px-3 py-2 text-sm cursor-pointer"
           >
-            Delete Server
-            <Trash className="h-4 w-4 ml-auto" />
+            <span className="group-hover:text-rose-500 group-hover:dark:text-rose-500">Delete Server</span>
+            <Trash className="h-4 w-4 ml-auto group-hover:text-rose-500 group-hover:dark:text-rose-500" />
           </DropdownMenuItem>
         )}
         {!isAdmin && (

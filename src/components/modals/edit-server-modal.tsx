@@ -64,7 +64,8 @@ const EditServerModal: FC = () => {
   };
 
   const handleClose = () => {
-    form.reset();
+    // ! we are resetting the form with the original values to avoid UI glitch of the image upload component appearing
+    form.reset({ name: server?.name, imageUrl: server?.imageUrl });
     onClose();
   };
 

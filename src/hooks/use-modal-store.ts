@@ -1,5 +1,5 @@
 import { Nullable } from "@/types/helpers";
-import { TServer } from "@/types/model";
+import { TChannel, TChannelType, TServer } from "@/types/model";
 import { create } from "zustand";
 
 export type ModalType =
@@ -9,10 +9,14 @@ export type ModalType =
   | "members"
   | "createChannel"
   | "leaveServer"
-  | "deleteServer";
+  | "deleteServer"
+  | "deleteChannel"
+  | "editChannel";
 
 interface IModalData {
   server?: TServer;
+  channelType?: TChannelType;
+  channel?: TChannel;
 }
 
 interface IModalStore {
