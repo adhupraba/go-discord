@@ -1,4 +1,4 @@
-import { GenericObject } from "./helpers";
+import { GenericObject, Nullable } from "./helpers";
 
 export type TChannelType = "TEXT" | "VIDEO" | "AUDIO";
 
@@ -39,6 +39,36 @@ export type TServer = {
   imageUrl: string;
   inviteCode: string;
   profileId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TMessage = {
+  id: string;
+  content: string;
+  fileUrl?: Nullable<string>;
+  memberId: string;
+  channelId: string;
+  deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TConversation = {
+  id: string;
+  memberOneId: string;
+  memberTwoId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TDirectMessage = {
+  id: string;
+  content: string;
+  fileUrl?: Nullable<string>;
+  memberId: string;
+  conversationId: string;
+  deleted: boolean;
   createdAt: string;
   updatedAt: string;
 };

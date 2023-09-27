@@ -39,7 +39,7 @@ const EditChannelModal: FC = () => {
     },
   });
 
-  const { channel } = data;
+  const { channel, server } = data;
   const isModalOpen = isOpen && type === "editChannel";
   const isLoading = form.formState.isSubmitting;
 
@@ -52,7 +52,7 @@ const EditChannelModal: FC = () => {
 
   const onSubmit = async (values: FormSchema) => {
     try {
-      await webAxios.patch(`/api/channel/${channel?.id}?serverId=${channel?.serverId}`, values);
+      await webAxios.patch(`/api/channel/${channel?.id}?serverId=${server?.id}`, values);
       form.reset();
       router.refresh();
       onClose();

@@ -26,8 +26,13 @@ const ServerMember: FC<IServerMemberProps> = ({ member, server }) => {
 
   const icon = roleIconMap[member.role];
 
+  const onClick = () => {
+    router.push(`/servers/${server.id}/conversations/${member.id}`);
+  };
+
   return (
     <button
+      onClick={onClick}
       className={cn(
         "group p-2 rounded-md flex items-center justify-between w-full hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1",
         params.memberId === member.id && "bg-zinc-700/20 dark:bg-zinc-700"

@@ -1,5 +1,5 @@
 import { Nullable } from "./helpers";
-import { TChannel, TMember, TProfile, TServer } from "./model";
+import { TChannel, TConversation, TMember, TProfile, TServer } from "./model";
 
 export type TProfileWithServer = TProfile & { server: Nullable<TServer> };
 
@@ -12,4 +12,9 @@ export type TServerWithChannelsAndMembers = TServer & {
 
 export type TServerWithMembers = TServer & {
   members: TMemberWithProfile[];
+};
+
+export type TConversationWithMemberAndProfile = TConversation & {
+  memberOne: TMemberWithProfile;
+  memberTwo: TMemberWithProfile;
 };

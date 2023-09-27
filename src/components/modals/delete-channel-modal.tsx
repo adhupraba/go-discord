@@ -19,7 +19,7 @@ const DeleteChannelModal: FC = () => {
   const {
     isOpen,
     type,
-    data: { channel },
+    data: { channel, server },
     onClose,
   } = useModal();
 
@@ -31,11 +31,11 @@ const DeleteChannelModal: FC = () => {
     try {
       setIsLoading(true);
 
-      await webAxios.delete(`/api/channel/${channel?.id}?serverId=${channel?.serverId}`);
+      await webAxios.delete(`/api/channel/${channel?.id}?serverId=${server?.id}`);
 
       onClose();
       router.refresh();
-      router.push(`/servers/${channel?.serverId}`);
+      router.push(`/servers/${server?.id}`);
     } catch (err) {
     } finally {
       setIsLoading(false);
