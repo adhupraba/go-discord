@@ -1,5 +1,6 @@
 import ChatHeader from "@/components/chat/chat-header";
 import ChatInput from "@/components/chat/chat-input";
+import ChatMessages from "@/components/chat/chat-messages";
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
 import { TApiRes } from "@/types/api";
@@ -30,7 +31,19 @@ const ChannelPage = async ({ params: { serverId, channelId } }: IChannelPageProp
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
       <ChatHeader name={channel.name} serverId={serverId} type="channel" />
-      <div className="flex-1">Future Messages</div>
+      <div className="flex-1">
+        <ChatMessages
+          member={member}
+          name={channel.name}
+          chatId={channel.id}
+          type="channel"
+          apiUrl="/api/messages"
+          socketUrl="/api/socket/messages"
+          socketQuery={{ channelId: channel.id, serverId: channel.serverId }}
+          paramKey="channelId"
+          paramValue={channel.id}
+        />
+      </div>
       <ChatInput
         apiUrl="/ws/messages"
         name={channel.name}
