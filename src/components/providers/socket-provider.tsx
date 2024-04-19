@@ -1,7 +1,9 @@
 "use client";
 
 import { webEnv } from "@/constants/config";
+import { TWsOutgoingMessage } from "@/types/types";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import Cookie from "js-cookie";
 
 type TSocketContext = {
   socket: WebSocket | null;
@@ -22,13 +24,18 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   const connectWs = () => {
-    const ws = new WebSocket(`${webEnv.wsUrl}/ws`);
+    const ws = new WebSocket(`${webEnv.wsUrl}/ws/connect`);
 
     ws.onopen = () => {
       console.log("ws opened");
       setIsConnected(true);
 
-      ws.send(JSON.stringify({ type: "ping" }));
+      ws.send(
+        JSON.stringify({
+          event: "AUTHENTICATE",
+          authToken: Cookie.get("__session"),
+        } satisfies TWsOutgoingMessage)
+      );
     };
 
     ws.onclose = () => {
@@ -45,6 +52,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return ws;
+  };
+
+  const sendMessage = (msg: TWsOutgoingMessage) => {
+    socket?.send(JSON.stringify(msg));
   };
 
   useEffect(() => {

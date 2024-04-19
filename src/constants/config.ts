@@ -5,4 +5,5 @@ export const webEnv = {
 
 export const serverEnv = {
   apiUrl: process.env.API_URL || "",
+  wsUrl: process.env.WS_URL || "",
 };

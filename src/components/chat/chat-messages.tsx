@@ -1,10 +1,12 @@
 "use client";
 
 import { TMember } from "@/types/model";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import ChatWelcome from "./chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
+import { useSocket } from "../providers/socket-provider";
+import { TWsOutgoingMessage } from "@/types/types";
 
 interface IChatMessagesProps {
   name: string;
@@ -29,12 +31,27 @@ const ChatMessages: FC<IChatMessagesProps> = ({
   paramValue,
   type,
 }) => {
+  const { socket, isConnected } = useSocket();
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useChatQuery({
     queryKey: `chat:${chatId}`,
     apiUrl,
     paramKey,
     paramValue,
   });
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    socket?.send(
+      JSON.stringify({
+        event: "JOIN_ROOM",
+        memberId: member.id,
+        roomId: paramValue,
+        roomType: paramKey === "channelId" ? "CHANNEL" : "CONVERSATION",
+      } satisfies TWsOutgoingMessage)
+    );
+  }, [isConnected]);
 
   if (status === "pending") {
     return (
