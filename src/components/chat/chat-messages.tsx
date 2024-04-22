@@ -1,20 +1,24 @@
 "use client";
 
-import { TMember } from "@/types/model";
-import { FC, useEffect } from "react";
+import { FC, Fragment, useEffect } from "react";
 import ChatWelcome from "./chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
-import { useSocket } from "../providers/socket-provider";
-import { TWsOutgoingMessage } from "@/types/types";
+import { useSocket } from "@/components/providers/socket-provider";
+import type { TMember } from "@/types/model";
+import type { TWsOutgoingMessage } from "@/types/types";
+import ChatItem from "./chat-item";
+import { format } from "date-fns/format";
+
+const DATE_FORMAT = "d MMM yyy, HH:mm";
 
 interface IChatMessagesProps {
   name: string;
   member: TMember;
   chatId: string;
   apiUrl: string;
-  socketUrl: string;
-  socketQuery: Record<string, string>;
+  wsUrl: string;
+  wsQuery: Record<string, string>;
   paramKey: "channelId" | "conversationId";
   paramValue: string;
   type: "channel" | "conversation";
@@ -25,8 +29,8 @@ const ChatMessages: FC<IChatMessagesProps> = ({
   member,
   chatId,
   apiUrl,
-  socketUrl,
-  socketQuery,
+  wsUrl,
+  wsQuery,
   paramKey,
   paramValue,
   type,
@@ -75,6 +79,27 @@ const ChatMessages: FC<IChatMessagesProps> = ({
     <div className="flex-1 flex flex-col py-4 overflow-y-auto">
       <div className="flex-1" />
       <ChatWelcome type={type} name={name} />
+      <div className="flex flex-col-reverse mt-auto">
+        {data?.pages.map((page, idx) => (
+          <Fragment key={idx}>
+            {page.messages.map((message) => (
+              <ChatItem
+                key={message.id}
+                id={message.id}
+                content={message.content}
+                member={message.member}
+                fileUrl={message.fileUrl}
+                isDeleted={message.deleted}
+                timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+                isUpdated={message.updatedAt !== message.createdAt}
+                currMember={member}
+                wsUrl={wsUrl}
+                wsQuery={wsQuery}
+              />
+            ))}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 };

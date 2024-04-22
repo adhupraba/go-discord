@@ -1,8 +1,8 @@
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiRes } from "@/types/api";
-import { TChannel } from "@/types/model";
-import { redirectToSignIn } from "@clerk/nextjs";
+import type { TApiRes } from "@/types/api";
+import type { TChannel } from "@/types/model";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 interface IServerPageProps {
@@ -12,7 +12,7 @@ interface IServerPageProps {
 const ServerPage = async ({ params: { serverId } }: IServerPageProps) => {
   const profile = await currentProfile();
 
-  if (!profile) return redirectToSignIn();
+  if (!profile) return auth().redirectToSignIn();
 
   const { data } = await serverAxios().get<TApiRes<TChannel>>(`/api/server/${serverId}/general-channel`);
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { TMemberRole } from "@/types/model";
-import { TServerWithMembers } from "@/types/types";
+import type { TMemberRole } from "@/types/model";
+import type { TServerWithMembers } from "@/types/types";
 import { FC } from "react";
 import {
   DropdownMenu,

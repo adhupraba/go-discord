@@ -2,10 +2,9 @@ import ChatHeader from "@/components/chat/chat-header";
 import { getOrCreateConversation } from "@/lib/conversation";
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiRes } from "@/types/api";
-import { TMember } from "@/types/model";
-import { TMemberWithProfile } from "@/types/types";
-import { redirectToSignIn } from "@clerk/nextjs";
+import type { TApiRes } from "@/types/api";
+import type { TMemberWithProfile } from "@/types/types";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 interface IConversationPageProps {
@@ -15,7 +14,7 @@ interface IConversationPageProps {
 const ConversationPage = async ({ params: { serverId, memberId } }: IConversationPageProps) => {
   const profile = await currentProfile();
 
-  if (!profile) return redirectToSignIn();
+  if (!profile) return auth().redirectToSignIn();
 
   const { data } = await serverAxios().get<TApiRes<TMemberWithProfile>>(`/api/member/server/${serverId}`);
 

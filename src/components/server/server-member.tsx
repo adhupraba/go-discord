@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { TMemberRole, TServer } from "@/types/model";
-import { TMemberWithProfile } from "@/types/types";
+import type { TMemberRole, TServer } from "@/types/model";
+import type { TMemberWithProfile } from "@/types/types";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { FC, ReactNode } from "react";

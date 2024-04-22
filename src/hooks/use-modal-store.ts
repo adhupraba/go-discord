@@ -1,5 +1,5 @@
-import { Nullable } from "@/types/helpers";
-import { TChannel, TChannelType, TServer } from "@/types/model";
+import type { Nullable } from "@/types/helpers";
+import type { TChannel, TChannelType, TServer } from "@/types/model";
 import { create } from "zustand";
 
 export type ModalType =

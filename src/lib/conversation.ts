@@ -1,6 +1,6 @@
-import { TApiRes } from "@/types/api";
 import { serverAxios } from "./server-axios";
-import { TConversationWithMemberAndProfile } from "@/types/types";
+import type { TApiRes } from "@/types/api";
+import type { TConversationWithMemberAndProfile } from "@/types/types";
 
 export async function getOrCreateConversation(memberOneId: string, memberTwoId: string) {
   let conv = (await findConversation(memberOneId, memberTwoId)) || (await findConversation(memberTwoId, memberOneId));

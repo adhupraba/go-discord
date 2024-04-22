@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { useOrigin } from "@/hooks/use-origin";
 import { webAxios } from "@/lib/web-axios";
-import { TApiData, TApiRes } from "@/types/api";
-import { TServer } from "@/types/model";
+import type { TApiData } from "@/types/api";
+import type { TServer } from "@/types/model";
 
 const InviteModal: FC = () => {
   const {

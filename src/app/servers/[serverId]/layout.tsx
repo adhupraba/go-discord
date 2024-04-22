@@ -1,9 +1,9 @@
 import ServerSidebar from "@/components/server/server-sidebar";
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiData, TApiRes } from "@/types/api";
-import { TServer } from "@/types/model";
-import { redirectToSignIn } from "@clerk/nextjs";
+import type { TApiData, TApiRes } from "@/types/api";
+import type { TServer } from "@/types/model";
+import { auth } from "@clerk/nextjs/server";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -18,6 +18,10 @@ interface IServerLayoutProps {
 export const generateMetadata = async ({ params: { serverId } }: { params: Params }): Promise<Metadata> => {
   const { data } = await serverAxios().get<TApiData<TServer>>(`/api/server/${serverId}`);
 
+  if (!data.error || !data?.data?.id) {
+    return {};
+  }
+
   return {
     title: `${data.data.name} | Discord`,
     description: `${data.data.name} Server`,
@@ -27,7 +31,7 @@ export const generateMetadata = async ({ params: { serverId } }: { params: Param
 const ServerLayout = async ({ children, params: { serverId } }: IServerLayoutProps) => {
   const profile = await currentProfile();
 
-  if (!profile) return redirectToSignIn();
+  if (!profile) return auth().redirectToSignIn();
 
   const { data } = await serverAxios().get<TApiRes<TServer>>(`/api/server/${serverId}`);
 

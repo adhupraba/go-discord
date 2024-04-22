@@ -7,8 +7,8 @@ import NavigationItem from "./navigation-item";
 import { ModeToggle } from "@/components/mode-toggle";
 import { UserButton } from "@clerk/nextjs";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiRes } from "@/types/api";
-import { TServer } from "@/types/model";
+import type { TApiRes } from "@/types/api";
+import type { TServer } from "@/types/model";
 
 interface INavigationSidebarProps {}
 

@@ -12,7 +12,7 @@ import { webAxios } from "@/lib/web-axios";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TChannelType } from "@/types/model";
+import type { TChannelType } from "@/types/model";
 
 const channelTypes: [TChannelType, ...TChannelType[]] = ["AUDIO", "VIDEO", "TEXT"];
 

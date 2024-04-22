@@ -1,7 +1,7 @@
 "use client";
 
 import { webEnv } from "@/constants/config";
-import { TWsOutgoingMessage } from "@/types/types";
+import type { TWsOutgoingMessage } from "@/types/types";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import Cookie from "js-cookie";
 
@@ -33,7 +33,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       ws.send(
         JSON.stringify({
           event: "AUTHENTICATE",
-          authToken: Cookie.get("__session"),
+          authToken: Cookie.get("__session") || null,
         } satisfies TWsOutgoingMessage)
       );
     };

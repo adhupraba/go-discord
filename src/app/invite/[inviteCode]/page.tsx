@@ -1,8 +1,8 @@
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiRes } from "@/types/api";
-import { TMember, TServer } from "@/types/model";
-import { redirectToSignIn } from "@clerk/nextjs";
+import type { TApiRes } from "@/types/api";
+import type { TMember, TServer } from "@/types/model";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 interface IInvitePageProps {
@@ -16,7 +16,7 @@ type NewData = { existing: false; member: TMember };
 const InvitePage = async ({ params: { inviteCode } }: IInvitePageProps) => {
   const profile = await currentProfile();
 
-  if (!profile) return redirectToSignIn();
+  if (!profile) return auth().redirectToSignIn();
 
   if (!inviteCode) return redirect("/");
 

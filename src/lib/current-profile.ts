@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { serverAxios } from "./server-axios";
-import { TApiRes } from "@/types/api";
-import { TProfile } from "@/types/model";
+import type { TApiRes } from "@/types/api";
+import type { TProfile } from "@/types/model";
 
 export const currentProfile = async () => {
   const { userId } = auth();

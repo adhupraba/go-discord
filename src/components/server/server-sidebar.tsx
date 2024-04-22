@@ -1,8 +1,8 @@
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
-import { TApiRes } from "@/types/api";
-import { TChannelType, TMemberRole } from "@/types/model";
-import { TServerWithChannelsAndMembers } from "@/types/types";
+import type { TApiRes } from "@/types/api";
+import type { TChannelType, TMemberRole } from "@/types/model";
+import type { TServerWithChannelsAndMembers } from "@/types/types";
 import { redirect } from "next/navigation";
 import ServerHeader from "./server-header";
 import { ScrollArea } from "@/components/ui/scroll-area";

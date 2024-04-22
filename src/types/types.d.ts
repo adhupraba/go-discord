@@ -21,7 +21,7 @@ export type TConversationWithMemberAndProfile = TConversation & {
 
 export type TWsMessageEvent = "AUTHENTICATE" | "JOIN_ROOM" | "BROADCAST" | "NEW_MESSAGE";
 
-type TWsMessageContent = (Omit<TMessage, "channelId"> & { roomId: string; member: TMemberWithProfile })[];
+type TWsMessageContent = Omit<TMessage, "channelId"> & { roomId: string; member: TMemberWithProfile };
 
 export type TWsIncomingMessage = {
   event: TWsMessageEvent;

@@ -1,7 +1,7 @@
 "use client";
 
-import { TChannelType, TMemberRole } from "@/types/model";
-import { TServerWithChannelsAndMembers } from "@/types/types";
+import type { TChannelType, TMemberRole } from "@/types/model";
+import type { TServerWithChannelsAndMembers } from "@/types/types";
 import { FC } from "react";
 import ActionTooltip from "@/components/action-tooltip";
 import { Plus, Settings } from "lucide-react";

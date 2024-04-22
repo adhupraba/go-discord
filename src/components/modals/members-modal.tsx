@@ -3,10 +3,11 @@
 import { FC, ReactNode, useState } from "react";
 import { useModal } from "@/hooks/use-modal-store";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { TServerWithChannelsAndMembers, TServerWithMembers } from "@/types/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import UserAvatar from "@/components/user-avatar";
-import { TMemberRole } from "@/types/model";
+import type { TServerWithChannelsAndMembers, TServerWithMembers } from "@/types/types";
+import type { TMemberRole } from "@/types/model";
+import type { TApiData } from "@/types/api";
 import { Check, Gavel, Loader2, MoreVertical, Shield, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { webAxios } from "@/lib/web-axios";
 import { useRouter } from "next/navigation";
-import { TApiData } from "@/types/api";
 
 const roleIconMap: { [key in TMemberRole]: ReactNode } = {
   GUEST: null,
