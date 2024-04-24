@@ -1,14 +1,15 @@
 "use client";
 
-import { FC, Fragment, useEffect } from "react";
+import { FC, Fragment, useEffect, useRef, ElementRef } from "react";
 import ChatWelcome from "./chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
 import { useSocket } from "@/components/providers/socket-provider";
 import type { TMember } from "@/types/model";
-import type { TWsOutgoingMessage } from "@/types/types";
 import ChatItem from "./chat-item";
 import { format } from "date-fns/format";
+import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 const DATE_FORMAT = "d MMM yyy, HH:mm";
 
@@ -35,27 +36,37 @@ const ChatMessages: FC<IChatMessagesProps> = ({
   paramValue,
   type,
 }) => {
-  const { socket, isConnected } = useSocket();
+  const queryKey = `chat:${chatId}`;
 
+  const chatRef = useRef<ElementRef<"div">>(null);
+  const bottomRef = useRef<ElementRef<"div">>(null);
+
+  const { socket, isConnected } = useSocket();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useChatQuery({
-    queryKey: `chat:${chatId}`,
+    queryKey,
     apiUrl,
     paramKey,
     paramValue,
+  });
+  useChatSocket({ queryKey, roomId: chatId });
+  useChatScroll({
+    chatRef,
+    bottomRef,
+    loadMore: fetchNextPage,
+    shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+    count: data?.pages?.[0]?.messages?.length ?? 0,
   });
 
   useEffect(() => {
     if (!isConnected) return;
 
-    socket?.send(
-      JSON.stringify({
-        event: "JOIN_ROOM",
-        memberId: member.id,
-        roomId: paramValue,
-        roomType: paramKey === "channelId" ? "CHANNEL" : "CONVERSATION",
-      } satisfies TWsOutgoingMessage)
-    );
-  }, [isConnected]);
+    socket?.send({
+      event: "JOIN_ROOM",
+      memberId: member.id,
+      roomId: paramValue,
+      roomType: paramKey === "channelId" ? "CHANNEL" : "CONVERSATION",
+    });
+  }, [isConnected, member.id, paramKey, paramValue, socket]);
 
   if (status === "pending") {
     return (
@@ -76,9 +87,27 @@ const ChatMessages: FC<IChatMessagesProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col py-4 overflow-y-auto">
-      <div className="flex-1" />
-      <ChatWelcome type={type} name={name} />
+    <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
+      {!hasNextPage && (
+        <Fragment>
+          <div className="flex-1" />
+          <ChatWelcome type={type} name={name} />
+        </Fragment>
+      )}
+      {hasNextPage && (
+        <div className="flex justify-center">
+          {isFetchingNextPage ? (
+            <Loader2 className="h-6 w-6 text-zinc-500 animate-spin my-4" />
+          ) : (
+            <button
+              className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 text-xs my-4 dark:hover:text-zinc-300 transition"
+              onClick={() => fetchNextPage()}
+            >
+              Load previous messages
+            </button>
+          )}
+        </div>
+      )}
       <div className="flex flex-col-reverse mt-auto">
         {data?.pages.map((page, idx) => (
           <Fragment key={idx}>
@@ -100,6 +129,7 @@ const ChatMessages: FC<IChatMessagesProps> = ({
           </Fragment>
         ))}
       </div>
+      <div ref={bottomRef} />
     </div>
   );
 };

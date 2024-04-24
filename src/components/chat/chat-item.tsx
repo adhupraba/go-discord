@@ -15,6 +15,8 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { webAxios } from "@/lib/web-axios";
+import { useModal } from "@/hooks/use-modal-store";
+import { useParams, useRouter } from "next/navigation";
 
 interface IChatItemProps {
   id: string;
@@ -53,8 +55,12 @@ const ChatItem: FC<IChatItemProps> = ({
   wsUrl,
   wsQuery,
 }) => {
+  const router = useRouter();
+  const params = useParams();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { onOpen } = useModal();
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -64,6 +70,14 @@ const ChatItem: FC<IChatItemProps> = ({
   });
 
   const isLoading = form.formState.isLoading;
+
+  const onMemberClick = () => {
+    if (member.id === currMember.id) {
+      return;
+    }
+
+    router.push(`/servers/${params.serverId}/conversations/${member.id}`);
+  };
 
   const onSubmit = async (values: FormSchema) => {
     try {
@@ -107,13 +121,15 @@ const ChatItem: FC<IChatItemProps> = ({
   return (
     <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
       <div className="group flex gap-x-2 items-start w-full">
-        <div className="cursor-pointer hover:drop-shadow-md transition">
+        <div className="cursor-pointer hover:drop-shadow-md transition" onClick={onMemberClick}>
           <UserAvatar src={member.profile.imageUrl} />
         </div>
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-x-2">
             <div className="flex items-center">
-              <p className="font-semibold text-sm hover:underline cursor-pointer">{member.profile.name}</p>
+              <p className="font-semibold text-sm hover:underline cursor-pointer" onClick={onMemberClick}>
+                {member.profile.name}
+              </p>
               <ActionTooltip label={member.role}>{roleIconMap[member.role]}</ActionTooltip>
             </div>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">{timestamp}</span>
@@ -196,7 +212,7 @@ const ChatItem: FC<IChatItemProps> = ({
           )}
           <ActionTooltip label="Delete">
             <Trash
-              onClick={() => setIsDeleting(true)}
+              onClick={() => onOpen("deleteMessage", { apiUrl: `${wsUrl}/${id}`, query: wsQuery })}
               className="cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
             />
           </ActionTooltip>

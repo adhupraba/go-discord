@@ -12,7 +12,7 @@ interface IUseChatQueryProps {
   paramValue: string;
 }
 
-type MessageData = { messages: TWsMessageContent[]; nextCursor: string | null };
+export type MessageData = { messages: TWsMessageContent[]; nextCursor: string | null };
 
 export const useChatQuery = ({ queryKey, apiUrl, paramKey, paramValue }: IUseChatQueryProps) => {
   const { isConnected } = useSocket();
@@ -42,10 +42,6 @@ export const useChatQuery = ({ queryKey, apiUrl, paramKey, paramValue }: IUseCha
     refetchInterval: isConnected ? false : 1000,
     retry: 3,
   });
-
-  useEffect(() => {
-    console.log("fetched messages =>", data);
-  }, [data]);
 
   return {
     data,

@@ -19,13 +19,19 @@ export type TConversationWithMemberAndProfile = TConversation & {
   memberTwo: TMemberWithProfile;
 };
 
-export type TWsMessageEvent = "AUTHENTICATE" | "JOIN_ROOM" | "BROADCAST" | "NEW_MESSAGE";
+export type TWsMessageEvent =
+  | "AUTHENTICATE"
+  | "ACKNOWLEDGED"
+  | "JOIN_ROOM"
+  | "BROADCAST"
+  | "NEW_MESSAGE"
+  | "MESSAGE_MODIFIED";
 
 type TWsMessageContent = Omit<TMessage, "channelId"> & { roomId: string; member: TMemberWithProfile };
 
 export type TWsIncomingMessage = {
   event: TWsMessageEvent;
-  message: TWsMessageContent;
+  message?: TWsMessageContent | null;
 };
 
 export type TWsOutgoingMessageBody = {

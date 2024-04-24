@@ -1,12 +1,12 @@
 "use client";
 
-import { webEnv } from "@/constants/config";
-import type { TWsOutgoingMessage } from "@/types/types";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import Cookie from "js-cookie";
+import { Websocket } from "@/lib/websocket";
+import { TWsIncomingMessage } from "@/types/types";
+import { usePub } from "@/hooks/use-pub-sub";
 
 type TSocketContext = {
-  socket: WebSocket | null;
+  socket: Websocket | null;
   isConnected: boolean;
 };
 
@@ -20,51 +20,35 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [socket, setSocket] = useState<Websocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const connectWs = () => {
-    const ws = new WebSocket(`${webEnv.wsUrl}/ws/connect`);
-
-    ws.onopen = () => {
-      console.log("ws opened");
-      setIsConnected(true);
-
-      ws.send(
-        JSON.stringify({
-          event: "AUTHENTICATE",
-          authToken: Cookie.get("__session") || null,
-        } satisfies TWsOutgoingMessage)
-      );
-    };
-
-    ws.onclose = () => {
-      console.log("ws closed");
-      setIsConnected(false);
-    };
-
-    ws.onmessage = (ev) => {
-      console.log("ws message received", ev);
-    };
-
-    ws.onerror = (ev) => {
-      console.log("ws errored", ev);
-    };
-
-    return ws;
-  };
-
-  const sendMessage = (msg: TWsOutgoingMessage) => {
-    socket?.send(JSON.stringify(msg));
-  };
+  const publish = usePub();
 
   useEffect(() => {
-    const ws = connectWs();
+    const client = new Websocket();
 
-    setSocket(ws);
+    setSocket(client);
+
+    client.ws.onmessage = (e) => {
+      if (e.data) {
+        try {
+          const data = JSON.parse(e.data) as TWsIncomingMessage;
+
+          if (data.event === "ACKNOWLEDGED") {
+            setIsConnected(true);
+          }
+
+          publish(data.event, data.message);
+        } catch (err) {
+          console.error("invalid json data");
+        }
+      }
+    };
 
     return () => {
-      ws.close();
+      client.ws.close();
+      setIsConnected(false);
     };
   }, []);
 
