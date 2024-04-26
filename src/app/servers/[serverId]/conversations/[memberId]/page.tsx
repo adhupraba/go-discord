@@ -1,4 +1,6 @@
 import ChatHeader from "@/components/chat/chat-header";
+import ChatInput from "@/components/chat/chat-input";
+import ChatMessages from "@/components/chat/chat-messages";
 import { getOrCreateConversation } from "@/lib/conversation";
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
@@ -26,7 +28,7 @@ const ConversationPage = async ({ params: { serverId, memberId } }: IConversatio
   if (!conversation) return redirect(`/servers/${serverId}`);
 
   const { memberOne, memberTwo } = conversation;
-  const otherMember = memberOne.profileId === profile.id ? memberTwo : memberTwo;
+  const otherMember = memberOne.profileId === profile.id ? memberTwo : memberOne;
 
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
@@ -35,6 +37,23 @@ const ConversationPage = async ({ params: { serverId, memberId } }: IConversatio
         serverId={serverId}
         type="conversation"
         imageUrl={otherMember.profile.imageUrl}
+      />
+      <ChatMessages
+        member={currMember}
+        name={otherMember.profile.name}
+        chatId={conversation.id}
+        type="conversation"
+        apiUrl="/api/direct-message"
+        wsUrl="/ws/direct-message"
+        wsQuery={{ conversationId: conversation.id }}
+        paramKey="conversationId"
+        paramValue={conversation.id}
+      />
+      <ChatInput
+        apiUrl="/ws/direct-message/send"
+        name={otherMember.profile.name}
+        query={{ conversationId: conversation.id }}
+        type="channel"
       />
     </div>
   );
