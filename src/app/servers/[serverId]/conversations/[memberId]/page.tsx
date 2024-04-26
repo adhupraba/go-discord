@@ -1,6 +1,7 @@
 import ChatHeader from "@/components/chat/chat-header";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
+import MediaRoom from "@/components/media-room";
 import { getOrCreateConversation } from "@/lib/conversation";
 import { currentProfile } from "@/lib/current-profile";
 import { serverAxios } from "@/lib/server-axios";
@@ -11,9 +12,10 @@ import { redirect } from "next/navigation";
 
 interface IConversationPageProps {
   params: { serverId: string; memberId: string };
+  searchParams: { video?: boolean };
 }
 
-const ConversationPage = async ({ params: { serverId, memberId } }: IConversationPageProps) => {
+const ConversationPage = async ({ params: { serverId, memberId }, searchParams }: IConversationPageProps) => {
   const profile = await currentProfile();
 
   if (!profile) return auth().redirectToSignIn();
@@ -38,23 +40,28 @@ const ConversationPage = async ({ params: { serverId, memberId } }: IConversatio
         type="conversation"
         imageUrl={otherMember.profile.imageUrl}
       />
-      <ChatMessages
-        member={currMember}
-        name={otherMember.profile.name}
-        chatId={conversation.id}
-        type="conversation"
-        apiUrl="/api/direct-message"
-        wsUrl="/ws/direct-message"
-        wsQuery={{ conversationId: conversation.id }}
-        paramKey="conversationId"
-        paramValue={conversation.id}
-      />
-      <ChatInput
-        apiUrl="/ws/direct-message/send"
-        name={otherMember.profile.name}
-        query={{ conversationId: conversation.id }}
-        type="channel"
-      />
+      {!searchParams?.video && (
+        <>
+          <ChatMessages
+            member={currMember}
+            name={otherMember.profile.name}
+            chatId={conversation.id}
+            type="conversation"
+            apiUrl="/api/direct-message"
+            wsUrl="/ws/direct-message"
+            wsQuery={{ conversationId: conversation.id }}
+            paramKey="conversationId"
+            paramValue={conversation.id}
+          />
+          <ChatInput
+            apiUrl="/ws/direct-message/send"
+            name={otherMember.profile.name}
+            query={{ conversationId: conversation.id }}
+            type="channel"
+          />
+        </>
+      )}
+      {searchParams.video && <MediaRoom chatId={conversation.id} video={true} audio={false} />}
     </div>
   );
 };
