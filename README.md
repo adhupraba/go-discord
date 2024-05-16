@@ -1,4 +1,5 @@
 This project is live at: https://go-discord.vercel.app
+
 The source code for the backend is at: https://github.com/adhupraba/discord-server
 
 ---
