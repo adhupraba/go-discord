@@ -23,7 +23,7 @@ export const generateMetadata = async ({ params: { serverId } }: { params: Param
   }
 
   return {
-    title: `${data.data.name} | Discord`,
+    title: `${data.data.name} | Go Discord`,
     description: `${data.data.name} Server`,
   };
 };

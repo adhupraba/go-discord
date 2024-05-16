@@ -14,7 +14,7 @@ import { ourFileRouter } from "./api/uploadthing/core";
 const openSans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Discord",
+  title: "Go Discord",
   description: "Discord clone",
 };
 

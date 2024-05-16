@@ -1,6 +1,9 @@
 This project is live at: https://go-discord.vercel.app
+The source code for the backend is at: https://github.com/adhupraba/discord-server
 
 ---
+
+# Go Discord
 
 Key Features:
 
@@ -20,7 +23,3 @@ Key Features:
 - Websocket fallback: Polling with alerts
 - Authentication with Clerk
 - High performance backend written in Go
-
----
-
-Backend repository is at: https://github.com/adhupraba/discord-server
