@@ -1,0 +1,129 @@
+name: Deploy Breadit Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - server/**
+      - .github/workflows/server.yaml
+      - .github/actions/prepare-env/action.yaml
+      - docker-compose.prod.yaml
+
+jobs:
+  server-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        architecture: [amd64, arm64]
+
+    env:
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-server"
+
+    steps:
+      - name: Check architecture
+        run: |
+          echo ${{ runner.os }} ${{ matrix.architecture }}
+          uname -m
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: ./server/dockerfile.prod.server
+          context: server
+          platforms: linux/${{ matrix.architecture }}
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ matrix.architecture }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:${{ matrix.architecture }}-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:${{ matrix.architecture }}-cache,mode=max
+
+      - name: Remove Docker Manifest
+        run: |
+          docker manifest rm ${{ env.IMAGE_NAME }}:${{ matrix.architecture }} || true
+          docker manifest rm ${{ env.IMAGE_NAME }} || true
+
+  server-manifest:
+    needs: server-build
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-server"
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and Push Multi-Arch Manifest
+        run: |
+          docker manifest create ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:amd64 ${{ env.IMAGE_NAME }}:arm64
+          docker manifest push ${{ env.IMAGE_NAME }}:latest
+
+  server-deploy:
+    needs: server-manifest
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-server"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Prepare .env
+        uses: ./.github/actions/prepare-env
+        with:
+          env_file_path: .env.server
+          secrets_json: |
+            {
+              \"PORT\": \"${{ secrets.BACKEND_PORT }}\",
+              \"ENV\": \"${{ secrets.ENV }}\",
+              \"DB_URL\": \"${{ secrets.BACKEND_DB_URL }}\",
+              \"CORS_ALLOWED_ORIGINS\": \"${{ secrets.BACKEND_CORS_ALLOWED_ORIGINS }}\"
+              \"CLERK_SECRET_KEY\": \"${{ secrets.BACKEND_CLERK_SECRET_KEY }}\",
+            }
+
+      - name: Sync code to server
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SERVER_SSH_KEY_PASSPHRASE }}
+          source: ./docker-compose.prod.yaml,./.env.server
+          target: /home/${{ secrets.SERVER_USER }}/breadit/
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SERVER_SSH_KEY_PASSPHRASE }}
+          script: |
+            cd /home/${{ secrets.SERVER_USER }}/breadit
+            docker pull ${{ env.IMAGE_NAME }}:latest
+            docker compose -f docker-compose.prod.yaml stop server
+            docker compose -f docker-compose.prod.yaml rm -f server
+            docker compose -f docker-compose.prod.yaml up -d server
