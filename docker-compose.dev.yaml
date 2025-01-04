@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: server
+      dockerfile: dockerfile.dev.server
+    env_file:
+      - .env.server
+    ports:
+      - "4601:4601"
+    container_name: discord_server
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:4601/gateway/health/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
+
+  client:
+    build:
+      context: client
+      dockerfile: dockerfile.dev.client
+    env_file:
+      - .env.client
+    ports:
+      - "4600:4600"
+    container_name: discord_client
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:4600/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
