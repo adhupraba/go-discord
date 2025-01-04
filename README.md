@@ -3,6 +3,8 @@
 An end-to-end fullstack and real-time discord clone, all with servers, channels, video
 calls, audio calls, editing and deleting messages as well as member roles.
 
+This project is live at: https://discord.adhupraba.com
+
 Key Features:
 
 - Real-time messaging using sockets
@@ -21,8 +23,6 @@ Key Features:
 - Websocket fallback: Polling with alerts
 - Authentication with Clerk
 - High performance backend written in Go
-
-This project is live at: https://discord.adhupraba.com
 
 ---
 
@@ -55,7 +55,7 @@ The project includes a Docker setup for running both the client and server simul
 
 - Update the `.env.client` and `.env.server` files with appropriate values.
 
-2. Connecting to local database from the Docker containers
+2. **Connecting to local database from the Docker containers**:
 
 > Note: Step 2 not needed if you are using a cloud hosted database/redis or a postgres/redis service in the compose file.
 
@@ -83,7 +83,7 @@ The project includes a Docker setup for running both the client and server simul
 
 3. **Adding new environment variables (Important)**:
 
-Whenever a new `NEXT_PUBLIC_` env needs to be added, make sure to update the `dockerfile.dev.client` or `dockerfile.prod.client` with a placeholder value and add that env entry into `entrypoint.sh` so at runtime the placeholder is replaced with appropriate value taken from the supplied `.env.client` file in the docker compose file.
+Whenever a new `NEXT_PUBLIC_` env needs to be added to the client, make sure to update the `dockerfile.dev.client` and `dockerfile.prod.client` with a placeholder value and add that env entry into `entrypoint.sh` so at runtime the placeholder is replaced with appropriate value taken from the supplied `.env.client` file to the docker compose file.
 
 4. **Build and Run the Docker Containers**:
 
