@@ -1,5 +1,8 @@
 # Go Discord
 
+An end-to-end fullstack and real-time discord clone, all with servers, channels, video
+calls, audio calls, editing and deleting messages as well as member roles.
+
 Key Features:
 
 - Real-time messaging using sockets
@@ -30,7 +33,6 @@ This project is live at: https://discord.adhupraba.com
   - [Running Locally](#running-locally)
     - [Backend Setup](#backend-setup-django-server)
     - [Frontend Setup](#frontend-setup-react-client)
-- [Generating Unique Secret Keys](#secret-keys)
 - [Cross Site Cookies](#cross-site-cookies)
 - [API Access](#api-access)
 
@@ -53,13 +55,11 @@ The project includes a Docker setup for running both the client and server simul
 
 - Update the `.env.client` and `.env.server` files with appropriate values.
 
-- Please generate unique keys for secret env variables at the time of running the application for better security. See [Generating Unique Secret Keys](#secret-keys) section.
-
-2. Connecting to local database and redis from the Docker containers
+2. Connecting to local database from the Docker containers
 
 > Note: Step 2 not needed if you are using a cloud hosted database/redis or a postgres/redis service in the compose file.
 
-- If you are using a local database and local redis server and want to connect to the application, some changes to the env are needed.
+- If you are using a local database and want to connect to the application, some changes to the env are needed.
 
 - Identify the `docker0` interface's ip address:
 
@@ -75,14 +75,17 @@ The project includes a Docker setup for running both the client and server simul
   172.17.0.1 host.docker.internal
   ```
 
-- Update the hostname of database and redis urls in .env.server
+- Update the hostname of database in .env.server
 
   ```bash
   DB_URL=postgresql://<user>:<password>@172.17.0.1:5432/<dbname>
-  REDIS_URL=redis://172.17.0.1:6379
   ```
 
-3. **Build and Run the Docker Containers**:
+3. **Adding new environment variables (Important)**:
+
+Whenever a new `NEXT_PUBLIC_` env needs to be added, make sure to update the `dockerfile.dev.client` or `dockerfile.prod.client` with a placeholder value and add that env entry into `entrypoint.sh` so at runtime the placeholder is replaced with appropriate value taken from the supplied `.env.client` file in the docker compose file.
+
+4. **Build and Run the Docker Containers**:
 
 - From the project root directory, run:
 
@@ -90,11 +93,11 @@ The project includes a Docker setup for running both the client and server simul
   docker compose -f docker-compose.dev.yaml up --build
   ```
 
-4. **Access the application**:
+5. **Access the application**:
 
-- Frontend: `http://localhost:2800/`
+- Frontend: `http://localhost:4600/`
 
-- Backend: `http://localhost:2801/gateway/`
+- Backend: `http://localhost:4601/gateway/`
 
 ### **Running Locally**
 
@@ -110,6 +113,7 @@ cd server
 
 ```bash
 go install github.com/pressly/goose/v3/cmd/goose@latest
+go install github.com/go-jet/jet/v2/cmd/jet@latest
 go install github.com/githubnemo/CompileDaemon@latest
 go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 go mod tidy
@@ -124,8 +128,6 @@ go mod tidy
   ```
 
 - Update the `.env` file with appropriate values
-
-- Please generate unique keys at the time of running the application for better security. See [Generating Unique Secret Keys](#secret-keys) section.
 
 4. **To generate SQL migrations**
 
@@ -142,13 +144,13 @@ sh migrate.sh
 6. **During development, to generate Go code for the SQL migrations and queries**:
 
 ```bash
-sqlc generate
+sh gen.sh
 ```
 
 7. **Start the dev server**:
 
 ```bash
-CompileDaemon --command="./breadit-server"
+CompileDaemon --command="./discord-server"
 ```
 
 8. **Build for production**:
@@ -158,13 +160,13 @@ CompileDaemon --command="./breadit-server"
   - Generate build executable
 
     ```bash
-    go build -tags netgo -ldflags '-s -w' -o breadit-server
+    go build -tags netgo -ldflags '-s -w' -o discord-server
     ```
 
   - Run the server
 
     ```bash
-    ./breadit-server
+    ./discord-server
     ```
 
 - To produce a more compressed and efficient executable
@@ -178,19 +180,19 @@ CompileDaemon --command="./breadit-server"
   - Generate build executable
 
     ```bash
-    go build -tags netgo -ldflags '-s -w' -o breadit-server
+    go build -tags netgo -ldflags '-s -w' -o discord-server
     ```
 
   - Generate a `upx` executable
 
     ```bash
-    upx --best --lzma -o breadit-server.upx breadit-server
+    upx --best --lzma -o discord-server.upx discord-server
     ```
 
   - Run the `upx` executable
 
     ```bash
-    ./breadit-server.upx
+    ./discord-server.upx
     ```
 
 ---
@@ -219,8 +221,6 @@ npm install
 
 - Update the `.env` file with appropriate values
 
-- Please generate unique keys at the time of running the application for better security. See [Generating Unique Secret Keys](#secret-keys) section.
-
 4. **Start the Frontend Development Server**:
 
 ```bash
@@ -235,21 +235,9 @@ npm run build
 
 ---
 
-## **Generating Unique Secret Keys**
-
-```bash
-  # generates 32 bytes key (use this for generating secret and file encryption key)
-  openssl enc -aes-128-cbc -k secret -P -md sha1
-
-  # generates 64 bytes key (use this for generating jwt secrets)
-  openssl enc -aes-256-cbc -k secret -P -md sha1
-```
-
----
-
 ## **Cross Site Cookies**
 
-> Cross site cookies are cookies set in the client from a different domain. Client and server are under different domains. eg: Client - http://localhost:2800 or https://www.abc.com, Server - http://localhost:2801 or https://www.def.com
+> Cross site cookies are cookies set in the client from a different domain. Client and server are under different domains. eg: Client - http://localhost:4600 or https://www.abc.com, Server - http://localhost:4601 or https://www.def.com
 
 Normally cross-site cookies are not sent to the server if server is in a different domain. So as a work around what is done is to implement a `api path rewrite` in the `next.config.js`
 
@@ -267,9 +255,9 @@ To test backend endpoints, use tools like Postman or curl.
 Example endpoint for health check:
 
 ```bash
-POST http://localhost:2801/gateway/health/heartbeat/
+POST http://localhost:4601/gateway/health/heartbeat/
 ```
 
 ---
 
-You’re now ready to run and develop Breadit locally or using Docker! 🚀
+You’re now ready to run and develop Discord locally or using Docker! 🚀
