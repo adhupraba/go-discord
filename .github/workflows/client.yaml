@@ -1,4 +1,4 @@
-name: Deploy Breadit Client
+name: Deploy Discord Client
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
         architecture: [amd64, arm64]
 
     env:
-      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-client"
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/discord-client"
 
     steps:
       - name: Check architecture
@@ -53,8 +53,6 @@ jobs:
           platforms: linux/${{ matrix.architecture }}
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ matrix.architecture }}
-          build-args: |
-            API_URL=${{ secrets.CLIENT_API_URL }}
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:${{ matrix.architecture }}-cache
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:${{ matrix.architecture }}-cache,mode=max
 
@@ -68,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-client"
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/discord-client"
 
     steps:
       - name: Login to Docker Hub
@@ -87,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/breadit-client"
+      IMAGE_NAME: "${{ secrets.DOCKERHUB_USERNAME }}/discord-client"
 
     steps:
       - name: Checkout code
@@ -125,7 +123,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SERVER_SSH_KEY_PASSPHRASE }}
           source: ./docker-compose.prod.yaml,./.env.client
-          target: /home/${{ secrets.SERVER_USER }}/breadit/
+          target: /home/${{ secrets.SERVER_USER }}/discord/
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.2.0
@@ -135,7 +133,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SERVER_SSH_KEY_PASSPHRASE }}
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/breadit
+            cd /home/${{ secrets.SERVER_USER }}/discord
             docker pull ${{ env.IMAGE_NAME }}:latest
             docker compose -f docker-compose.prod.yaml stop client
             docker compose -f docker-compose.prod.yaml rm -f client
